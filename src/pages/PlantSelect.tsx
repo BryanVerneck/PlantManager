@@ -9,8 +9,9 @@ import fonts from '../../styles/fonts';
 import { EnviromentButton } from '../components/EnviromentButton';
 import api from '../services/api';
 import { PlantCardPrimary } from '../components/PlantCardPrimary';
+import { useNavigation } from '@react-navigation/native';
 
-interface EnviromentProps {
+interface EnvironmentProps {
     key: string;
     title: string;
 }
@@ -29,10 +30,12 @@ interface PlantProps {
 }
 
 export function PlantSelect(){
-    const [enviroments, setEnviroments] = useState<EnviromentProps[]>([]);
+    const [enviroments, setEnviroments] = useState<EnvironmentProps[]>([]);
     const [plants, setPlants] = useState<PlantProps[]>([]);
     const [filteredPlants, setFilteredPlants] = useState<PlantProps[]>([]);
     const [environmentSelected, setEnvironmentSelected] = useState('all');
+
+    const navigation = useNavigation()
 
     function handleEnvironmentSelected(environment: string){
         setEnvironmentSelected(environment);
@@ -45,6 +48,10 @@ export function PlantSelect(){
         );
 
         setFilteredPlants(filtered);
+    }
+
+    function handlePlantSelected(plant: PlantProps){
+      navigation.navigate('PlantSave', {plant});
     }
 
     useEffect(() => {
@@ -91,6 +98,7 @@ export function PlantSelect(){
             <View>
                 <FlatList 
                     data={enviroments}
+                    keyExtractor={(item) => String(item.key)}
                     renderItem={({ item }) => (
                         <EnviromentButton 
                             title={item.title}
@@ -108,8 +116,12 @@ export function PlantSelect(){
             <View style={styles.plants}>
                 <FlatList
                     data={filteredPlants}
+                    keyExtractor={(item) => String(item.id)}
                     renderItem={({ item }) => (
-                        <PlantCardPrimary data={item} />
+                        <PlantCardPrimary 
+                          data={item}
+                          onPress={() => handlePlantSelected(item)}
+                        />
                     )}
 
                     showsVerticalScrollIndicator={false}
